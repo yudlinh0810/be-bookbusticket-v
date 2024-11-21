@@ -30,3 +30,5 @@ const port = process.env.PORT || 3003;
 app.listen(port, () => {
   console.log(`server running on http://localhost:${port}`);
 });
+
+const connection = require('./database/connect');

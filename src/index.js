@@ -31,7 +31,7 @@ app.listen(port, () => {
   console.log(`server running on http://localhost:${port}`);
 });
 
-const routes = require('./routes');
+const routes = require('./routes/routes');
 routes(app);
 
 const connection = require('./database/connect');

@@ -35,3 +35,26 @@ const routes = require('./routes/routes');
 routes(app);
 
 const connection = require('./database/connect');
+
+app.get('/deploy_check', (req, res) => {
+  const query = `
+    select trip.name, departure.location, destination.location, car.license_plate, seat.position
+    from trip
+    inner join departure
+    on trip.departure_id = departure.id
+    inner join destination
+    on trip.destination_id = destination.id
+    inner join car
+    on trip.car_id = car.id
+    inner join seat
+    on seat.car_id = car.id
+  `;
+  connection.query(query, (err, result) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).send({ error: 'Database query failed' });
+    }
+    console.log(result);
+    res.send(result);
+  });
+});

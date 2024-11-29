@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
+const connection = require('./database/connect');
 dotenv.config();
 
 const app = express();
@@ -9,7 +10,13 @@ const app = express();
 //Middleware
 
 // Bật Cross-Origin Resource Sharing (cho phép các yêu cầu từ source khác)
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.URL_FRONTEND, //URL frontend
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  })
+);
 
 // Xử lý request body với dữ liệu dạng JSON và giới hạn kích thước tối đa là 50MB
 app.use(express.json({ limit: '50mb' }));
@@ -22,7 +29,7 @@ app.use(cookieParser());
 
 //Test route
 app.get('/', (req, res) => {
-  res.send('Hello');
+  res.send('Welcome to Book Bus Ticket');
 });
 
 //Start server
@@ -33,28 +40,3 @@ app.listen(port, () => {
 
 const routes = require('./routes/routes');
 routes(app);
-
-const connection = require('./database/connect');
-
-app.get('/deploy_check', (req, res) => {
-  const query = `
-    select trip.name, departure.location, destination.location, car.license_plate, seat.position
-    from trip
-    inner join departure
-    on trip.departure_id = departure.id
-    inner join destination
-    on trip.destination_id = destination.id
-    inner join car
-    on trip.car_id = car.id
-    inner join seat
-    on seat.car_id = car.id
-  `;
-  connection.query(query, (err, result) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).send({ error: 'Database query failed' });
-    }
-    console.log(result);
-    res.send(result);
-  });
-});

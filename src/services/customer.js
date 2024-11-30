@@ -7,16 +7,72 @@ const checkUser = async (email) => {
     const [rows] = await (await connection).query('select * from person where email = ?', [email]);
     return rows.length > 0 ? rows[0] : null;
   } catch (error) {
-    console.error('Error checking user:', error);
     throw error;
   }
+};
+
+const countCustomer = async () => {
+  try {
+    const query = 'select count(*) from customer';
+    const [rows] = await (await connection).query(query);
+    const result = rows[0]['count(*)'];
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const register = (newCustomer) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { email, password } = newCustomer;
+
+      const checkPerson = await checkUser(email);
+      if (checkPerson) {
+        return resolve({
+          status: 'ERR',
+          message: 'This user already exists',
+        });
+      }
+
+      const count = await countCustomer();
+
+      const passwordHash = bcrypt.hashSync(password, 10);
+
+      const userId = count < 9 ? `CTM0${count + 1}` : `CTM${count + 1}`;
+
+      const sqlPerson = `INSERT INTO person (id, email, password, role_id, status_id) VALUES (?, ?, ?, ?, ?)`;
+      const values = [userId, email, passwordHash, 'CTM', 'PS01'];
+
+      (await connection).query(sqlPerson, values);
+
+      const sqlCustomer = `INSERT INTO customer (id) VALUES (?)`;
+
+      (await connection).query(sqlCustomer, [userId]);
+
+      const newUser = await checkUser(email);
+      if (newUser) {
+        const access_token = generalAccessToken({ id: newUser.id, role: newUser.role });
+        const refresh_token = generalRefreshToken({ id: newUser.id, role: newUser.role });
+
+        return resolve({
+          status: 'OK',
+          message: 'Register success',
+          data: newCustomer,
+          access_token,
+          refresh_token,
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
 };
 
 const login = (customerLogin) => {
   return new Promise(async (resolve, reject) => {
     try {
       const checkPerson = await checkUser(customerLogin.email);
-      console.log('checkPerson', checkPerson);
       if (checkPerson === null) {
         resolve({
           status: 'ERR',
@@ -39,8 +95,7 @@ const login = (customerLogin) => {
             id: checkPerson?.id,
             role: checkPerson?.role,
           });
-          console.log('Access token:', access_token); // In ra access token để kiểm tra
-          console.log('Refresh token:', refresh_token);
+
           resolve({
             status: 'OK',
             message: 'Login success',
@@ -55,4 +110,4 @@ const login = (customerLogin) => {
   });
 };
 
-module.exports = { login, checkUser };
+module.exports = { login, checkUser, countCustomer, register };

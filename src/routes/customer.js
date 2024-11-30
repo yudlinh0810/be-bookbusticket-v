@@ -4,5 +4,6 @@ const router = express.Router();
 require('dotenv').config();
 
 router.post('/login', CustomerController.login);
+router.post('/register', CustomerController.register);
 
 module.exports = router;

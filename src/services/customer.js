@@ -1,24 +1,58 @@
-// add driver
-// const moment = require('moment');
-// const driverLicenseDate = moment(`27-11-2020`, 'DD/MM/YYYY').format('YYYY/MM/DD');
-// const sql = `INSERT INTO driver (id, driver_license_receipt_date) VALUES (?, ?)`;
-// const value = ['DRV01', driverLicenseDate];
+const connection = require('../database/connect');
+const bcrypt = require('bcrypt');
+const { generalAccessToken, generalRefreshToken } = require('./jwt');
 
-// connection.execute(sql, value, (err, result) => {
-//   if (err) {
-//     throw err;
-//   }
-//   console.log(result);
-// });
+const checkUser = async (email) => {
+  try {
+    const [rows] = await (await connection).query('select * from person where email = ?', [email]);
+    return rows.length > 0 ? rows[0] : null;
+  } catch (error) {
+    console.error('Error checking user:', error);
+    throw error;
+  }
+};
 
-// get trip
-// select trip.name, departure.location, destination.location, car.license_plate, seat.position
-// from trip
-// inner join departure
-// on trip.departure_id = departure.id
-// inner join destination
-// on trip.destination_id = destination.id
-// inner join car
-// on trip.car_id = car.id
-// inner join seat
-// on seat.car_id = car.id
+const login = (customerLogin) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const checkPerson = await checkUser(customerLogin.email);
+      console.log('checkPerson', checkPerson);
+      if (checkPerson === null) {
+        resolve({
+          status: 'ERR',
+          message: 'The user is not defined',
+        });
+      } else {
+        const comparePass = await bcrypt.compareSync(customerLogin.password, checkPerson.password);
+        if (!comparePass) {
+          resolve({
+            status: 'ERR',
+            message: 'Password error',
+          });
+        } else {
+          const access_token = generalAccessToken({
+            id: checkPerson?.id,
+            role: checkPerson?.role,
+          });
+
+          const refresh_token = generalRefreshToken({
+            id: checkPerson?.id,
+            role: checkPerson?.role,
+          });
+          console.log('Access token:', access_token); // In ra access token để kiểm tra
+          console.log('Refresh token:', refresh_token);
+          resolve({
+            status: 'OK',
+            message: 'Login success',
+            access_token,
+            refresh_token,
+          });
+        }
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+module.exports = { login, checkUser };

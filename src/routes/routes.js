@@ -1,7 +1,7 @@
+const CustomerRouter = require('./customer');
+
 const routes = (app) => {
-  app.use('/api/test', (req, res, next) => {
-    res.json({ message: 'This is route test' });
-  });
+  app.use('/api/customer', CustomerRouter);
   app.use((req, res) => {
     res.status(404).json({
       status: 'ERROR',

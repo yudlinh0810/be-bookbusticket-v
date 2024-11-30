@@ -40,3 +40,6 @@ app.listen(port, () => {
 
 const routes = require('./routes/routes');
 routes(app);
+
+// const bcrypt = require('bcrypt');
+// console.log(bcrypt.hashSync('123456', 10));

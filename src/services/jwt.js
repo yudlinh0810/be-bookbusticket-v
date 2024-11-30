@@ -24,6 +24,7 @@ const generalRefreshToken = (payload) => {
     process.env.REFRESH_TOKEN,
     { expiresIn: '30s' }
   );
+  return refresh_token;
 };
 
 const checkRefreshToken = (token) => {

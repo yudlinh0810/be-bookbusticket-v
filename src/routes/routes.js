@@ -1,7 +1,9 @@
 const CustomerRouter = require('./customer');
+const TripRouter = require('./trip');
 
 const routes = (app) => {
   app.use('/api/customer', CustomerRouter);
+  app.use('/api/trip', TripRouter);
   app.use((req, res) => {
     res.status(404).json({
       status: 'ERROR',

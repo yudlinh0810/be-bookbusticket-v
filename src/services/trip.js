@@ -1,3 +1,4 @@
+const moment = require('moment');
 const connection = require('../database/connect');
 
 const searchTrips = (departure, destination, day_departure) => {
@@ -16,7 +17,11 @@ const searchTrips = (departure, destination, day_departure) => {
                       destination.location = ?
                    limit 10
                     `;
-      const values = [day_departure, departure, destination];
+      const values = [
+        moment(day_departure, 'DD/MM/YYYY').format('YYYY/MM/DD'),
+        departure,
+        destination,
+      ];
       const [trips] = await (await connection).query(sql, values);
       console.log('trips', trips);
       resolve({

@@ -5,5 +5,6 @@ require('dotenv').config();
 
 router.post('/login', CustomerController.login);
 router.post('/register', CustomerController.register);
+router.post('/verify-email', CustomerController.verifyEmail);
 
 module.exports = router;

@@ -22,8 +22,7 @@ const searchTrips = (departure, destination, day_departure) => {
         departure,
         destination,
       ];
-      const [trips] = await (await connection).query(sql, values);
-      console.log('trips', trips);
+      const [trips] = await (await connection).execute(sql, values);
       resolve({
         status: 'OK',
         message: 'Search trip success',

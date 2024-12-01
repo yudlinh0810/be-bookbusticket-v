@@ -90,4 +90,17 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { login, register };
+const verifyEmail = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const response = await CustomerService.verifyEmail(email, otp);
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(404).json({
+      status: 'ERR',
+      message: 'ERR Controller.verifyEmail',
+    });
+  }
+};
+
+module.exports = { login, register, verifyEmail };

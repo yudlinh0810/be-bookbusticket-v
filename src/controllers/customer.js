@@ -68,8 +68,8 @@ const login = async (req, res) => {
       });
     }
 
-    const data = await CustomerService.login(req.body);
-    const { refresh_token, ...newData } = data;
+    const response = await CustomerService.login(req.body);
+    const { refresh_token, ...newData } = response;
 
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
@@ -77,10 +77,7 @@ const login = async (req, res) => {
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    return res.status(200).json({
-      status: 'OK',
-      newData,
-    });
+    return res.status(200).json(newData);
   } catch (err) {
     console.log(err);
     return res.status(404).json({

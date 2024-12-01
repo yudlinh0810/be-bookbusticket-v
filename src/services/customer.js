@@ -48,15 +48,12 @@ const register = (newCustomer) => {
       });
 
       const passwordHash = await bcrypt.hash(password, 10);
-      console.log('51');
       await insertOtp({ otp, email, passwordHash, name });
-      console.log('53');
       await sendOtpEmail({ email, otp });
 
       resolve({
         status: 'OK',
         message: 'Create OTP success',
-        otp,
       });
     } catch (error) {
       reject(error);
@@ -87,7 +84,6 @@ const verifyEmail = (email, otp) => {
 
       if (isValid && email === checkOtp.email) {
         const count = await countCustomer();
-        console.log('count', count);
 
         const userId = count < 9 ? `CTM0${count + 1}` : `CTM${count + 1}`;
         const sqlPerson = `INSERT INTO person (id, email, name, password, role_id, status_id) VALUES (?, ?, ?, ?, ?, ?)`;
@@ -114,7 +110,6 @@ const verifyEmail = (email, otp) => {
         }
       }
     } catch (error) {
-      console.log('ERR Service.verifyEmail', error);
       reject(error);
     }
   });

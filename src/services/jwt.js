@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
+const { ProvidePlugin } = require('webpack');
 
 const generalAccessToken = (payload) => {
   const { id, role } = payload;
@@ -9,7 +10,7 @@ const generalAccessToken = (payload) => {
       role,
     },
     process.env.ACCESS_TOKEN,
-    { expiresIn: '10s' }
+    { expiresIn: '60s' }
   );
   return access_token;
 };
@@ -22,27 +23,24 @@ const generalRefreshToken = (payload) => {
       role,
     },
     process.env.REFRESH_TOKEN,
-    { expiresIn: '30s' }
+    { expiresIn: '60s' }
   );
   return refresh_token;
 };
 
-const checkRefreshToken = (token) => {
+const verifyRefreshToken = (token) => {
   return new Promise((resolve, reject) => {
     jwt.verify(token, process.env.REFRESH_TOKEN, async (err, user) => {
       if (err) {
-        resolve({
-          status: 'ERR',
-          message: 'The authentication',
-        });
+        return resolve({ status: 'ERR', message: 'The authentication failed' });
       }
-
-      const access_token = generalAccessToken({ id: user?.id, role: user?.role });
-
+      const access_token = await generalAccessToken({ id: user?.id, role: user?.role });
+      const refresh_token = await generalRefreshToken({ id: user?.id, role: user?.role });
       resolve({
         status: 'OK',
         message: 'Get user success',
         access_token,
+        refresh_token,
       });
     });
   });
@@ -51,5 +49,5 @@ const checkRefreshToken = (token) => {
 module.exports = {
   generalAccessToken,
   generalRefreshToken,
-  checkRefreshToken,
+  verifyRefreshToken,
 };

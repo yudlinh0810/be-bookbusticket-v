@@ -1,4 +1,5 @@
 const CustomerService = require('../services/customer');
+const { verifyRefreshToken } = require('../services/jwt');
 
 const register = async (req, res) => {
   try {
@@ -100,4 +101,32 @@ const verifyEmail = async (req, res) => {
   }
 };
 
-module.exports = { login, register, verifyEmail };
+const refreshToken = async (req, res) => {
+  try {
+    const token = req.headers.token.split(' ')[1];
+    if (!token) {
+      return res.status(200).json({
+        status: 'ERR',
+        message: 'Token is not defined',
+      });
+    }
+    const data = await verifyRefreshToken(token);
+    const { refresh_token, ...newData } = data;
+
+    res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+    return res.status(200).json(newData);
+  } catch (error) {
+    console.log('err refresh token', error);
+    return res.status(404).json({
+      status: 'ERR',
+      message: 'ERR Controller.refreshToken',
+    });
+  }
+};
+
+module.exports = { login, register, verifyEmail, refreshToken };

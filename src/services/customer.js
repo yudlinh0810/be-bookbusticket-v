@@ -1,9 +1,10 @@
 const connection = require('../database/connect');
 const bcrypt = require('bcrypt');
-const { generalAccessToken, generalRefreshToken } = require('./jwt');
+const { generalAccessToken, generalRefreshToken, decodeToken } = require('./jwt');
 const otpGenerator = require('otp-generator');
 const { insertOtp, isValidOtp, findOtp } = require('./otp');
 const { sendOtpEmail } = require('./email');
+const { getDetail } = require('./userService');
 
 const checkUser = async (email) => {
   try {
@@ -103,7 +104,6 @@ const verifyEmail = (email, otp) => {
           return resolve({
             status: 'OK',
             message: 'Register success',
-            data: newUser,
             access_token,
             refresh_token,
           });
@@ -156,4 +156,20 @@ const login = (customerLogin) => {
   });
 };
 
-module.exports = { login, checkUser, countCustomer, register, verifyEmail };
+const getDetailCustomer = (token) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await decodeToken(token);
+      const id = user.data.id;
+      const detail = await getDetail(id);
+      resolve({
+        status: 'OK',
+        data: detail,
+      });
+    } catch (error) {
+      console.log('Err Service.getDetail', error);
+    }
+  });
+};
+
+module.exports = { login, checkUser, countCustomer, register, verifyEmail, getDetailCustomer };

@@ -129,4 +129,25 @@ const refreshToken = async (req, res) => {
   }
 };
 
-module.exports = { login, register, verifyEmail, refreshToken };
+const getDetailCustomer = async (req, res) => {
+  try {
+    const token = req.body.access_token;
+    if (!token) {
+      return res.status(200).json({
+        status: 'ERR',
+        message: 'Token is not defined',
+      });
+    }
+    const data = await CustomerService.getDetailCustomer(token);
+    console.log('Controller:', data);
+    return res.status(200).json(data);
+  } catch (error) {
+    console.log('err refresh token', error);
+    return res.status(404).json({
+      status: 'ERR',
+      message: 'ERR Controller.refreshToken',
+    });
+  }
+};
+
+module.exports = { login, register, verifyEmail, refreshToken, getDetailCustomer };

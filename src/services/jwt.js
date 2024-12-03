@@ -10,7 +10,7 @@ const generalAccessToken = (payload) => {
       role,
     },
     process.env.ACCESS_TOKEN,
-    { expiresIn: '60s' }
+    { expiresIn: '365d' }
   );
   return access_token;
 };
@@ -23,7 +23,7 @@ const generalRefreshToken = (payload) => {
       role,
     },
     process.env.REFRESH_TOKEN,
-    { expiresIn: '60s' }
+    { expiresIn: '365d' }
   );
   return refresh_token;
 };
@@ -46,8 +46,21 @@ const verifyRefreshToken = (token) => {
   });
 };
 
+const decodeToken = (token) => {
+  return new Promise((resolve, reject) => {
+    const data = jwt.verify(token, process.env.ACCESS_TOKEN);
+
+    resolve({
+      status: 'OK',
+      message: 'Get user success',
+      data,
+    });
+  });
+};
+
 module.exports = {
   generalAccessToken,
   generalRefreshToken,
   verifyRefreshToken,
+  decodeToken,
 };

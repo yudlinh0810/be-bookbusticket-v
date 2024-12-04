@@ -2,6 +2,7 @@ require('dotenv').config();
 const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 const streamifier = require('streamifier');
+const deleteImageOld = require('../../services/deleteImage');
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -16,20 +17,30 @@ const storage = multer.memoryStorage(); //Sử dụng memoryStorage để lưu t
 const upload = multer({ storage }).single('file'); // Cấu hình nhận 1 file tại 1 thời điểm
 
 // Tải lên cloudinary
-const uploadToCloudinary = (req, res, next) => {
-  if (!req.file) {
-    return res.status(404).send('No file uploaded');
+const uploadToCloudinary = async (req, res, next) => {
+  if (!req.file || !req.file.buffer) {
+    return res.status(400).send('File upload is required');
   }
-
-  let folder = req.body.folder || 'bookbusticket/images';
-  const allowedFormats = ['jpg', 'png'];
+  let folder = 'bookbusticket/images';
+  const id = JSON.parse(req.body.data).id.slice(0, 3);
+  if (id === 'CTM') {
+    folder = `${folder}/customer/avatar/${JSON.parse(req.body.data).id}`;
+  } else if (id === 'STF') {
+    folder = `${folder}/staff/avatar/${JSON.parse(req.body.data).id}`;
+  } else if (id === 'DRV') {
+    folder = `${folder}/staff/avatar/${JSON.parse(req.body.data).id}`;
+  } else {
+    return res.status(400).send('The user not exist');
+  }
+  const allowedFormats = ['jpg', 'png', 'jpeg'];
 
   //Kiểm tra định dạng file
   const fileException = req.file.originalname.split('.').pop();
   if (!allowedFormats.includes(fileException)) {
     return res.status(400).send('Invalid file format. Only jpg and png are allowed');
   }
-
+  const public_img_id = JSON.parse(req.body.data).public_img_id;
+  console.log('public_img', public_img_id);
   // Tạo stream để upload ảnh từ memoryStorage lên cloudinary
   const stream = cloudinary.uploader.upload_stream(
     {
@@ -38,10 +49,11 @@ const uploadToCloudinary = (req, res, next) => {
     },
     (error, result) => {
       if (error) {
-        return res.status(500).send('Cloudinary upload failed: ', error.message);
+        console.error('Cloudinary upload error:', error);
+        return res.status(500).send(`Cloudinary upload failed: ${error.message}`);
       }
-
-      //Lưu URL từ cloudinary vào req.file
+      deleteImageOld(public_img_id);
+      req.file.cloudinaryPublic = result.public_id;
       req.file.cloudinaryURL = result.secure_url;
       next();
     }

@@ -150,4 +150,16 @@ const getDetailCustomer = async (req, res) => {
   }
 };
 
-module.exports = { login, register, verifyEmail, refreshToken, getDetailCustomer };
+const updateCustomer = async (req, res) => {
+  try {
+    const updateData = req.body;
+    const imageURL = req.file.cloudinaryURL;
+    const publicImg = req.file.cloudinaryPublic;
+    const data = await CustomerService.updateCustomer(updateData, imageURL, publicImg);
+    res.status(200).json(data);
+  } catch (error) {
+    console.log('Controller', error);
+  }
+};
+
+module.exports = { login, register, verifyEmail, refreshToken, getDetailCustomer, updateCustomer };

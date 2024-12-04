@@ -172,4 +172,39 @@ const getDetailCustomer = (token) => {
   });
 };
 
-module.exports = { login, checkUser, countCustomer, register, verifyEmail, getDetailCustomer };
+const updateCustomer = (update, image, publicImg) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const parseData = JSON.parse(update.data);
+      const sql =
+        'update person set name = ?, phone = ?, portrait = ?, public_img_id = ?, address = ?, day_birth = ? where id = ?';
+      const updateValue = [
+        parseData.name || null,
+        parseData.phone || null,
+        image,
+        publicImg,
+        parseData.address || null,
+        parseData.day_birth || null,
+        parseData.id || null,
+      ];
+      await (await connection).execute(sql, updateValue);
+      resolve({
+        status: 'OK',
+        message: 'Update user success',
+      });
+    } catch (error) {
+      console.log('err', error);
+      reject(error);
+    }
+  });
+};
+
+module.exports = {
+  login,
+  checkUser,
+  countCustomer,
+  register,
+  verifyEmail,
+  getDetailCustomer,
+  updateCustomer,
+};

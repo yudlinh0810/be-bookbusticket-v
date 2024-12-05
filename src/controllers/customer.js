@@ -159,6 +159,10 @@ const updateCustomer = async (req, res) => {
     res.status(200).json(data);
   } catch (error) {
     console.log('Controller', error);
+    return res.status(404).json({
+      status: 'ERR',
+      message: 'ERR Controller.updateCustomer',
+    });
   }
 };
 

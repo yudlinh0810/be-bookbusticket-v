@@ -52,7 +52,9 @@ const uploadToCloudinary = async (req, res, next) => {
         console.error('Cloudinary upload error:', error);
         return res.status(500).send(`Cloudinary upload failed: ${error.message}`);
       }
-      deleteImageOld(public_img_id);
+      if (public_img_id) {
+        deleteImageOld(public_img_id);
+      }
       req.file.cloudinaryPublic = result.public_id;
       req.file.cloudinaryURL = result.secure_url;
       next();

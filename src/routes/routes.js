@@ -1,5 +1,7 @@
 const CustomerRouter = require('./customer');
 const TripRouter = require('./trip');
+const DepartureRouter = require('./departure');
+const DestinationRouter = require('./destination');
 
 const routes = (app) => {
   // app.use((req, res, next) => {
@@ -16,6 +18,8 @@ const routes = (app) => {
   //   }
   // });
   app.use('/api/customer', CustomerRouter);
+  app.use('/api/departure', DepartureRouter);
+  app.use('/api/destination', DestinationRouter);
   app.use('/api/trip', TripRouter);
   app.use((req, res) => {
     res.status(404).json({

@@ -12,7 +12,11 @@ const app = express();
 // Bật Cross-Origin Resource Sharing (cho phép các yêu cầu từ source khác)
 app.use(
   cors({
-    origin: [process.env.URL_LOCALHOST, process.env.URL_FRONTEND],
+    origin: [
+      process.env.URL_LOCALHOST,
+      process.env.URL_FRONTEND,
+      'https://fe-bookbusticket-v2.vercel.app',
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })

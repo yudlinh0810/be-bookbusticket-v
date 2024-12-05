@@ -23,6 +23,12 @@ const searchTrips = (departure, destination, day_departure) => {
         destination,
       ];
       const [trips] = await (await connection).execute(sql, values);
+      if (trips.length < 1) {
+        resolve({
+          status: 'OK',
+          message: 'Trip not exist',
+        });
+      }
       resolve({
         status: 'OK',
         message: 'Search trip success',

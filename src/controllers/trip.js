@@ -5,9 +5,17 @@ const searchTrip = async (req, res) => {
     const departure = decodeURIComponent(req.query.departure);
     const destination = decodeURIComponent(req.query.destination);
     const dayDeparture = decodeURIComponent(req.query.day_departure);
-    const dataSearchTrip = await TripService.searchTrips(departure, destination, dayDeparture);
+    const price_arrangement = req.query.price_arrangement;
+
+    const dataSearchTrip = await TripService.searchTrips(
+      departure,
+      destination,
+      dayDeparture,
+      price_arrangement || 'ASC'
+    );
     return res.status(200).json(dataSearchTrip);
   } catch (error) {
+    console.log('err', error);
     return res.status(404).json({
       status: 'ERR',
       message: 'Err Controller.searchTrip',

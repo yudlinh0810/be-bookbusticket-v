@@ -1,9 +1,12 @@
 const moment = require('moment');
 const connection = require('../database/connect');
 
-const searchTrips = (departure, destination, day_departure) => {
+const searchTrips = (departure, destination, day_departure, price_arrangement) => {
   return new Promise(async (resolve, reject) => {
     try {
+      let priceArranType =
+        Number(price_arrangement) === 5 || Number(price_arrangement) === 0 ? 'DESC' : 'ASC';
+
       const sql = `select trip.id, trip.trip_name, car.car_name, car.license_plate,
                       count(seat.id) as available_seat,
                       trip.hours_departure, trip.day_departure,
@@ -23,6 +26,7 @@ const searchTrips = (departure, destination, day_departure) => {
                   group by
                       trip.id, trip.trip_name, car.car_name, car.license_plate, trip.day_departure,
                       trip.hours_departure, departure.location, destination.location, trip.price
+                  order by price ${priceArranType}
                     `;
       const values = [
         moment(day_departure, 'DD/MM/YYYY').format('YYYY/MM/DD'),

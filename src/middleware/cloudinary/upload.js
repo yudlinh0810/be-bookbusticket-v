@@ -18,8 +18,11 @@ const upload = multer({ storage }).single('file'); // Cấu hình nhận 1 file 
 
 // Tải lên cloudinary
 const uploadToCloudinary = async (req, res, next) => {
-  if (!req.file || !req.file.buffer) {
-    return res.status(400).send('File upload is required');
+  if (!req.file) {
+    return next();
+  }
+  if (!req.file.buffer) {
+    return res.status(400).send('Invalid file upload');
   }
   let folder = 'bookbusticket/images';
   const id = JSON.parse(req.body.data).id.slice(0, 3);
@@ -55,8 +58,8 @@ const uploadToCloudinary = async (req, res, next) => {
       if (public_img_id) {
         deleteImageOld(public_img_id);
       }
-      req.file.cloudinaryPublic = result.public_id;
-      req.file.cloudinaryURL = result.secure_url;
+      req.file.cloudinaryPublic = result.public_id || null;
+      req.file.cloudinaryURL = result.secure_url || null;
       next();
     }
   );

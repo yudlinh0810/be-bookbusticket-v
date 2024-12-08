@@ -153,8 +153,10 @@ const getDetailCustomer = async (req, res) => {
 const updateCustomer = async (req, res) => {
   try {
     const updateData = req.body;
-    const imageURL = req.file.cloudinaryURL;
-    const publicImg = req.file.cloudinaryPublic;
+    const imageURL = req?.file?.cloudinaryURL || null;
+    const publicImg = req?.file?.cloudinaryPublic || null;
+    console.log('body:', req.body);
+    console.log('file', req.file);
     const data = await CustomerService.updateCustomer(updateData, imageURL, publicImg);
     res.status(200).json(data);
   } catch (error) {

@@ -176,7 +176,6 @@ const updateCustomer = (update, image, publicImg) => {
   return new Promise(async (resolve, reject) => {
     try {
       const parseData = JSON.parse(update.data);
-      console.log(image, publicImg);
       if (image === null || publicImg === null) {
         const sql = 'update person set name = ?, phone = ?,address = ?, day_birth = ? where id = ?';
         const updateValue = [

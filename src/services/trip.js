@@ -4,8 +4,7 @@ const connection = require('../database/connect');
 const searchTrips = (departure, destination, day_departure, price_arrangement) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let priceArranType =
-        Number(price_arrangement) === 5 || Number(price_arrangement) === 0 ? 'DESC' : 'ASC';
+      let priceArranType = Number(price_arrangement) === 5 ? 'DESC' : 'ASC';
 
       const sql = `select trip.id, trip.trip_name, car.car_name, car.license_plate,
                       count(seat.id) as available_seat,
@@ -52,4 +51,28 @@ const searchTrips = (departure, destination, day_departure, price_arrangement) =
   });
 };
 
-module.exports = { searchTrips };
+const getAllTripSeat = (idTrip) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const sql = `select trip.id, trip.car_id as carId,seat.id as seatId, 
+                   seat.position as seat_position, seat.type_id as seat_type,
+                   seat.status_id as seat_status, trip.price
+                   from trip
+                   inner join car on trip.car_id = car.id
+                   inner join seat on trip.car_id = seat.car_id
+                   where trip.id = ?
+                    `;
+      const [rows] = await (await connection).execute(sql, [idTrip]);
+      resolve({
+        status: 'OK',
+        message: 'Get all trip seat success',
+        data: rows,
+      });
+    } catch (error) {
+      console.log('err getAllTripSeat', error);
+      reject(error);
+    }
+  });
+};
+
+module.exports = { searchTrips, getAllTripSeat };

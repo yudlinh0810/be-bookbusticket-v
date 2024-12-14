@@ -23,4 +23,18 @@ const searchTrip = async (req, res) => {
   }
 };
 
-module.exports = { searchTrip };
+const getAllTripSeat = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const data = await TripService.getAllTripSeat(id);
+    return res.status(200).json(data);
+  } catch (error) {
+    console.log('err', error);
+    return res.status(404).json({
+      status: 'ERR',
+      message: 'Err Controller.getAllTripSeat',
+    });
+  }
+};
+
+module.exports = { searchTrip, getAllTripSeat };

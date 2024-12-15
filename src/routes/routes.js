@@ -2,6 +2,7 @@ const CustomerRouter = require('./customer');
 const TripRouter = require('./trip');
 const DepartureRouter = require('./departure');
 const DestinationRouter = require('./destination');
+const StaffRouter = require('./staff');
 
 const routes = (app) => {
   // app.use((req, res, next) => {
@@ -17,6 +18,7 @@ const routes = (app) => {
   //     next();
   //   }
   // });
+  app.use('/api/staff', StaffRouter);
   app.use('/api/customer', CustomerRouter);
   app.use('/api/departure', DepartureRouter);
   app.use('/api/destination', DestinationRouter);

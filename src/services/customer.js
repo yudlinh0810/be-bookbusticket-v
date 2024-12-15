@@ -211,6 +211,83 @@ const updateCustomer = (update, image, publicImg) => {
   });
 };
 
+const deleteCustomer = (id) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const personDelete = (await connection).execute('delete from person where id = ?', [id]);
+      const customerDelete = (await connection).execute('delete from customer where id = ?', [id]);
+      console.log('first', personDelete);
+      console.log('second', customerDelete);
+      resolve({
+        status: 'OK',
+        message: 'Delete customer success',
+      });
+    } catch (error) {
+      console.log('Err Service.delete', error);
+    }
+  });
+};
+
+const getAllCustomer = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const [rows] = await (await connection).execute(`select * from person where id like 'CTM%'`);
+      resolve({
+        status: 'OK',
+        message: 'Get all customer success',
+        data: rows,
+      });
+    } catch (error) {
+      console.log('Err Service.getall', error);
+    }
+  });
+};
+
+const createCustomer = (newCustomer) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const checkCustomer = await checkUser(newCustomer.email);
+      if (checkCustomer) {
+        resolve({
+          status: 'ERR',
+          message: 'The customer already exist',
+        });
+      }
+
+      const hashPass = await bcrypt.hash(newCustomer.password, 10);
+      const count = await countCustomer();
+      const userId = count < 9 ? `CTM0${count + 1}` : `CTM${count + 1}`;
+      const sqlPerson = `INSERT INTO person (id, email, name, phone, password, role_id, status_id) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+      const values = [
+        userId,
+        newCustomer.email,
+        newCustomer.name,
+        newCustomer.phone,
+        hashPass,
+        'CTM',
+        'PS01',
+      ];
+
+      (await connection).query(sqlPerson, values);
+
+      const sqlCustomer = `INSERT INTO customer (id) VALUES (?)`;
+
+      (await connection).query(sqlCustomer, [userId]);
+      console.log('276');
+      const newUser = await checkUser(newCustomer.email);
+      if (newUser) {
+        console.log('289');
+        return resolve({
+          status: 'OK',
+          message: 'Create customer success',
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   login,
   checkUser,
@@ -219,4 +296,7 @@ module.exports = {
   verifyEmail,
   getDetailCustomer,
   updateCustomer,
+  deleteCustomer,
+  getAllCustomer,
+  createCustomer,
 };

@@ -166,4 +166,55 @@ const updateCustomer = async (req, res) => {
   }
 };
 
-module.exports = { login, register, verifyEmail, refreshToken, getDetailCustomer, updateCustomer };
+const deleteCustomer = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const data = await CustomerService.deleteCustomer(id);
+    res.status(200).json(data);
+  } catch (error) {
+    console.log('Controller', error);
+    return res.status(404).json({
+      status: 'ERR',
+      message: 'ERR Controller.deleteCustomer',
+    });
+  }
+};
+
+const getAllCustomer = async (req, res) => {
+  try {
+    const data = await CustomerService.getAllCustomer();
+    res.status(200).json(data);
+  } catch (error) {
+    console.log('Controller', error);
+    return res.status(404).json({
+      status: 'ERR',
+      message: 'ERR Controller.getAllCustomer',
+    });
+  }
+};
+
+const createCustomer = async (req, res) => {
+  try {
+    const newCustomer = req.body;
+    const data = await CustomerService.createCustomer(newCustomer);
+    res.status(200).json(data);
+  } catch (error) {
+    console.log('Controller', error);
+    return res.status(404).json({
+      status: 'ERR',
+      message: 'ERR Controller.createCustomer',
+    });
+  }
+};
+
+module.exports = {
+  login,
+  register,
+  verifyEmail,
+  refreshToken,
+  getDetailCustomer,
+  updateCustomer,
+  deleteCustomer,
+  getAllCustomer,
+  createCustomer,
+};

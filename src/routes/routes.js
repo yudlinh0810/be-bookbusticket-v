@@ -3,6 +3,7 @@ const TripRouter = require('./trip');
 const DepartureRouter = require('./departure');
 const DestinationRouter = require('./destination');
 const StaffRouter = require('./staff');
+const DriverRouter = require('./driver');
 
 const routes = (app) => {
   // app.use((req, res, next) => {
@@ -18,6 +19,7 @@ const routes = (app) => {
   //     next();
   //   }
   // });
+  app.use('/api/driver', DriverRouter);
   app.use('/api/staff', StaffRouter);
   app.use('/api/customer', CustomerRouter);
   app.use('/api/departure', DepartureRouter);

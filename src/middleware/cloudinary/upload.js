@@ -31,7 +31,7 @@ const uploadToCloudinary = async (req, res, next) => {
   } else if (id === 'STF') {
     folder = `${folder}/staff/avatar/${JSON.parse(req.body.data).id}`;
   } else if (id === 'DRV') {
-    folder = `${folder}/staff/avatar/${JSON.parse(req.body.data).id}`;
+    folder = `${folder}/driver/avatar/${JSON.parse(req.body.data).id}`;
   } else {
     return res.status(400).send('The user not exist');
   }
